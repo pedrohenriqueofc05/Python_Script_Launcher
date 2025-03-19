@@ -114,4 +114,4 @@ To build the executable version of the launcher:
 
 ## License
 
-Creative Commons NonCommercial 4.0 International (CC BY-NC 4.0)
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
