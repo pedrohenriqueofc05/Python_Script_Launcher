@@ -1,17 +1,22 @@
 {
-    "Example Script 1": {
-        "path": "C:\\ExampleFolder\\ExampleScript.py",
-        "args": ["arg1", "arg2"]
+    "config": {
+        "ROW_LIMIT": 4
     },
-    "Example Script 2": {
-        "path": "C:\\ExampleFolder\\ExampleScript.py",
-        "args": ["arg1", "arg2"]
-    },
-    "Example Script 3": {
-        "path": "C:\\ExampleFolder\\ExampleScript.py",
-        "args": ["arg1", "arg2"]
-    },
-    "Example Script No Args": {
-        "path": "C:\\ExampleFolder\\ExampleScript.py"
+    "scripts": {
+        "Example Script 1": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py",
+            "args": ["arg1", "arg2"]
+        },
+        "Example Script 2": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py",
+            "args": ["arg1", "arg2"]
+        },
+        "Example Script 3": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py",
+            "args": ["arg1", "arg2"]
+        },
+        "Example Script No Args": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py"
+        }
     }
 }
