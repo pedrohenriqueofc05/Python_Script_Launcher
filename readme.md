@@ -119,4 +119,4 @@ To build the executable version of the launcher:
 
 ## License
 
-Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+Under license via [MIT License](https://opensource.org/license/mit)
