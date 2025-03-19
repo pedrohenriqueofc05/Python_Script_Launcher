@@ -1,10 +1,17 @@
 {
-    "Example Script 1": "C:\\ExampleFolder\\ExampleScript.py",
-    "Example Script 2": "C:\\ExampleFolder\\ExampleScript2.py",
-    "Example Script 3": "C:\\ExampleFolder\\ExampleScript3.py",
-    "Example Script 4": "C:\\ExampleFolder\\ExampleScript4.py",
-    "Example Script 5": "C:\\ExampleFolder\\ExampleScript5.py",
-    "Example Script 6": "C:\\ExampleFolder\\ExampleScript6.py",
-    "Example Script 7": "C:\\ExampleFolder\\ExampleScript7.py",
-    "Example Script 8": "C:\\ExampleFolder\\ExampleScript8.py"
+    "Example Script 1": {
+        "path": "C:\\ExampleFolder\\ExampleScript.py",
+        "args": ["arg1", "arg2"]
+    },
+    "Example Script 2": {
+        "path": "C:\\ExampleFolder\\ExampleScript.py",
+        "args": ["arg1", "arg2"]
+    },
+    "Example Script 3": {
+        "path": "C:\\ExampleFolder\\ExampleScript.py",
+        "args": ["arg1", "arg2"]
+    },
+    "Example Script No Args": {
+        "path": "C:\\ExampleFolder\\ExampleScript.py"
+    }
 }
