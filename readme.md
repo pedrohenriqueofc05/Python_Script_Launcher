@@ -88,6 +88,11 @@ The `config.json` file is used to define the scripts available in the launcher. 
 -   The launcher automatically adjusts its interface based on the number of scripts configured.
 -   For troubleshooting, check the console output (source version) or logs (if implemented in the built version).
 
+## Known Issues
+
+- No support for command line arguments
+- No support for older versions of python
+
 ## Building the Executable
 
 To build the executable version of the launcher:
