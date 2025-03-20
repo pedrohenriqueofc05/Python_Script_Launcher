@@ -1,0 +1,6 @@
+2025-03-20 09:47:42 - 117 - check_dict - [ERROR] - Error: Command dictionary does not contain 'path' key.
+2025-03-20 09:47:43 - 95 - launch_app - [ERROR] - Error: The script 'C:\ExampleFolder\ExampleScript.py' does not exist.
+2025-03-20 09:47:44 - 95 - launch_app - [ERROR] - Error: The script 'C:\ExampleFolder\ExampleScript.py' does not exist.
+2025-03-20 09:47:44 - 95 - launch_app - [ERROR] - Error: The script 'C:\ExampleFolder\ExampleScript.py' does not exist.
+2025-03-20 09:47:45 - 95 - launch_app - [ERROR] - Error: The script 'C:\ExampleFolder\ExampleScript.py' does not exist.
+2025-03-20 09:47:45 - 117 - check_dict - [ERROR] - Error: Command dictionary does not contain 'path' key.
