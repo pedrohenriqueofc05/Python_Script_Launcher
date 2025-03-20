@@ -21,6 +21,7 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
 1. **Setup Configuration**:
 
     - Add your Python script paths, optional arguments, and configuration settings to the `config.json` file. Example structure:
+
         ```json
         {
             "config": {
@@ -38,12 +39,14 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
             }
         }
         ```
+
     - Place the `config.json` file in the same directory as the `src/__init__.py` file.
 
 2. **Run the Launcher**:
 
     - Open a terminal and navigate to the `src` directory.
     - Execute the following command:
+
         ```bash
         python __init__.py
         ```
@@ -57,6 +60,7 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
 1. **Setup Configuration**:
 
     - Add your Python script paths, optional arguments, and configuration settings to the `config.json` file. Example structure:
+
         ```json
         {
             "config": {
@@ -74,6 +78,7 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
             }
         }
         ```
+
     - Place the `config.json` file in the same directory as the built executable.
 
 2. **Run the Launcher**:
