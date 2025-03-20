@@ -1,4 +1,4 @@
-no# Python Script Launcher
+# Python Script Launcher
 
 ## Overview
 
@@ -8,20 +8,34 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
 
 -   Intuitive graphical interface for script execution.
 -   Cross-platform support (Windows, macOS, Linux).
--   Configurable script paths via `config.json`.
+-   Configurable script paths and arguments via `config.json`.
 -   Automatic detection of missing or invalid scripts.
--   Supports as many or few scripts as entered into JSON dict.
--   Window will adjust to fit.
+-   Supports as many or few scripts as entered into the JSON dictionary.
+-   Window automatically adjusts to fit the number of scripts.
+-   Configurable row limit for buttons via `config.json`.
+-   Detailed logging of application events and errors to `debug.log`.
+-   **"Always on Top"** toggle option to keep the launcher window above other windows. This option is saved when the toggle is adjusted.
 
 ## Usage (Source Version)
 
 1. **Setup Configuration**:
 
-    - Add your Python script paths to the `config.json` file. Example structure:
+    - Add your Python script paths, optional arguments, and configuration settings to the `config.json` file. Example structure:
         ```json
         {
-            "Script Name 1": "C:\\Path\\To\\Script1.py",
-            "Script Name 2": "C:\\Path\\To\\Script2.py"
+            "config": {
+                "ROW_LIMIT": 4,
+                "ALWAYS": true
+            },
+            "scripts": {
+                "Example Script 1": {
+                    "path": "C:\\ExampleFolder\\ExampleScript.py",
+                    "args": ["arg1", "arg2"]
+                },
+                "Example Script No Args": {
+                    "path": "C:\\ExampleFolder\\ExampleScript.py"
+                }
+            }
         }
         ```
     - Place the `config.json` file in the same directory as the `src/__init__.py` file.
@@ -36,16 +50,28 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
 
 3. **Use the Interface**:
     - Select a script from the graphical interface and click the corresponding button to execute it.
+    - Use the **"Always on Top"** checkbox to toggle whether the launcher window stays above other windows.
 
 ## Usage (Built Version)
 
 1. **Setup Configuration**:
 
-    - Add your Python script paths to the `config.json` file. Example structure:
+    - Add your Python script paths, optional arguments, and configuration settings to the `config.json` file. Example structure:
         ```json
         {
-            "Script Name 1": "C:\\Path\\To\\Script1.py",
-            "Script Name 2": "C:\\Path\\To\\Script2.py"
+            "config": {
+                "ROW_LIMIT": 4,
+                "ALWAYS": true
+            },
+            "scripts": {
+                "Example Script 1": {
+                    "path": "C:\\ExampleFolder\\ExampleScript.py",
+                    "args": ["arg1", "arg2"]
+                },
+                "Example Script No Args": {
+                    "path": "C:\\ExampleFolder\\ExampleScript.py"
+                }
+            }
         }
         ```
     - Place the `config.json` file in the same directory as the built executable.
@@ -56,20 +82,40 @@ The Python Script Launcher is a graphical tool designed to streamline the proces
 
 3. **Use the Interface**:
     - Select a script from the graphical interface and click the corresponding button to execute it.
+    - Use the **"Always on Top"** checkbox to toggle whether the launcher window stays above other windows.
 
 ## Configuration
 
-The `config.json` file is used to define the scripts available in the launcher. Example structure:
+The `config.json` file is used to define the scripts and settings available in the launcher. Example structure:
 
 ```json
 {
-    "Script Name 1": "C:\\Path\\To\\Script1.py",
-    "Script Name 2": "C:\\Path\\To\\Script2.py"
+    "config": {
+        "ROW_LIMIT": 4,
+        "ALWAYS": true
+    },
+    "scripts": {
+        "Example Script 1": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py",
+            "args": ["arg1", "arg2"]
+        },
+        "Example Script No Args": {
+            "path": "C:\\ExampleFolder\\ExampleScript.py"
+        }
+    }
 }
 ```
 
 -   Replace the paths with the absolute paths to your scripts.
+-   Add optional arguments as a list under the `args` key.
+-   Adjust the `ROW_LIMIT` value to control the maximum number of rows for buttons in the interface.
+-   Set the `ALWAYS` value to `true` or `false` to control whether the launcher window starts in "Always on Top" mode.
 -   Ensure the file is in the same directory as the launcher.
+
+## Logging
+
+-   All application events and errors are logged to a file named `debug.log` in the same directory as the launcher.
+-   The log includes timestamps, line numbers, function names, and detailed error messages for easier debugging.
 
 ## Requirements
 
@@ -85,13 +131,13 @@ The `config.json` file is used to define the scripts available in the launcher. 
 ## Notes
 
 -   Ensure all script paths in `config.json` are valid.
--   The launcher automatically adjusts its interface based on the number of scripts configured.
--   For troubleshooting, check the console output (source version) or logs (if implemented in the built version).
+-   The launcher automatically adjusts its interface based on the number of scripts configured and the `ROW_LIMIT` setting.
+-   For troubleshooting, check the `debug.log` file for detailed error messages.
 
 ## Known Issues
 
-- No support for command line arguments
-- No support for older versions of python
+-   No support for older versions of Python.
+-   Scripts without a valid `path` key in `config.json` will not be executed.
 
 ## Building the Executable
 
@@ -114,7 +160,7 @@ To build the executable version of the launcher:
 ## Troubleshooting
 
 -   If the launcher fails to start, ensure the `config.json` file is correctly formatted and placed in the appropriate directory.
--   For the source version, check the terminal for error messages.
+-   For the source version, check the `debug.log` file for error messages.
 -   For the built version, ensure all required scripts are accessible and valid.
 
 ## License
