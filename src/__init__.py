@@ -146,6 +146,29 @@ def load_data_config(dir) -> dict:
         return {}
 
 
+def write_config(dir, key, value) -> None:
+    """
+    Writes the configuration data to the config.json file.
+    The config.json file should be located in the specified directory.
+    Parameters:
+        dir (str): The directory where the config.json file is located.
+        key (str): The key to be updated in the config.json file's config dict.
+        value: The value to be set for the specified key.
+    """
+    try:
+        with open(os.path.join(dir, "config.json"), "r") as file:
+            data = json.load(file)
+            data["config"][key] = value
+        with open(os.path.join(dir, "config.json"), "w") as file:
+            json.dump(data, file, indent=4)
+    except FileNotFoundError:
+        logger.error("Error: config.json file not found.")
+    except json.JSONDecodeError:
+        logger.error("Error: Failed to decode JSON from config.json.")
+    except Exception as e:
+        logger.exception(f"Error writing to config.json: {e}")
+
+
 def create_button(
     row_index: int,
     column_index: int,
@@ -176,6 +199,9 @@ def create_window(scripts_dict: dict) -> None:
     Parameters:
         scripts_dict (dict): A dictionary containing the configuration data for the buttons.
     """
+
+    global ROW_LIMIT, ALWAYS, PROCESS
+
     # Create the main window
     root = ttk.Window(themename="darkly")
     root.title("Launcher")
@@ -264,7 +290,16 @@ def create_window(scripts_dict: dict) -> None:
 
     # Define the function to toggle the "Always on Top" attribute
     def toggle_always_on_top():
+        global ALWAYS
         root.attributes("-topmost", always_on_top_var.get())
+        if always_on_top_var.get() == 1:
+            if not ALWAYS:
+                ALWAYS = True
+                write_config(script_dir, "ALWAYS", ALWAYS)
+        else:
+            if ALWAYS:
+                ALWAYS = False
+                write_config(script_dir, "ALWAYS", ALWAYS)
 
     # Create a checkbox for "Always on Top"
     always_on_top_var = ttk.IntVar(value=1 if ALWAYS else 0)
