@@ -2,11 +2,33 @@ import os
 import sys
 import json
 import subprocess
+import logging
 from ttkbootstrap import *
 import ttkbootstrap as ttk
 
 # Constants
 ROW_LIMIT = 4  # Maximum number of rows for buttons in the window
+PROCESS = None  # Global variable to store the launched process
+ALWAYS = False  # Default value for "Always on Top" setting
+
+
+def create_logger() -> logging.Logger:
+    """
+    Creates a logger for the application.
+    The logger will log messages to a file named 'debug.log'.
+    """
+
+    logger = logging.getLogger("debug_logger")
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler("debug.log")
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(lineno)s - %(funcName)s - [%(levelname)s] - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 
 def launch_app(command_dict: dict) -> None:
@@ -19,10 +41,10 @@ def launch_app(command_dict: dict) -> None:
     Parameters:
         command_dict (dict): A dictionary containing the command data to be executed.
     """
+    global PROCESS  # Declare the global variable to store the launched process
     try:
         # Check if the command is a dictionary
         if not check_dict(command_dict):
-            print("Error: The command is not formatted correctly.")
             return
 
         # Get the script path and arguments
@@ -39,37 +61,42 @@ def launch_app(command_dict: dict) -> None:
 
         # Check if the script is a Python script
         if not script_path.endswith(".py"):
-            print("Error: The script is not a Python script.")
+            logger.error("Error: The script is not a Python script.")
             return
 
         # Check if the script exists
         if os.path.exists(script_path):
+
+            logger.debug(f"Launching the application: {script_path}")
+            logger.debug(f"Command: {cmd}")
+
+            # Check the platform and launch the application accordingly
             if sys.platform == "win32":
                 # Launch the application using subprocess
-                process = subprocess.Popen(["python", cmd], shell=True)
+                PROCESS = subprocess.Popen(["python", cmd], shell=True)
             elif sys.platform == "linux":
                 # Launch the application using subprocess
-                process = subprocess.Popen(["python3", cmd], shell=True)
+                PROCESS = subprocess.Popen(["python3", cmd], shell=True)
             elif sys.platform == "darwin":
                 # Launch the application using subprocess
-                process = subprocess.Popen(["python3", cmd], shell=True)
+                PROCESS = subprocess.Popen(["python3", cmd], shell=True)
             else:
-                print(f"Unsupported platform: {sys.platform}")
+                logger.error(f"Unsupported platform: {sys.platform}")
                 return
             # Wait for the process to complete
-            process.wait()
+            PROCESS.wait()
             # Check if the process was successful
-            if process.returncode == 0:
-                print(f"Successfully launched the application: {script_path}")
+            if PROCESS.returncode == 0:
+                logger.info(f"Successfully launched the application: {script_path}")
             else:
-                print(f"Failed to launch the application: {script_path}")
+                logger.error(f"Failed to launch the application: {script_path}")
                 return
         else:
-            print(f"Error: The script '{script_path}' does not exist.")
+            logger.error(f"Error: The script '{script_path}' does not exist.")
             return
 
     except Exception as e:
-        print(f"Error launching the application: {e}")
+        logger.exception(f"Error launching the application: {e}")
 
 
 def check_dict(command_dict: dict) -> bool:
@@ -84,12 +111,16 @@ def check_dict(command_dict: dict) -> bool:
         bool: True if the command dictionary is formatted correctly, False otherwise.
     """
     if not isinstance(command_dict, dict):
+        logger.error("Error: Command is not a dictionary.")
         return False
     if "path" not in command_dict:
+        logger.error("Error: Command dictionary does not contain 'path' key.")
         return False
     if not isinstance(command_dict["path"], str):
+        logger.error("Error: 'path' key in command dictionary is not a string.")
         return False
     if "args" in command_dict and not isinstance(command_dict["args"], (str, list)):
+        logger.error("Error: 'args' key in command dictionary is not a string or list.")
         return False
     return True
 
@@ -108,10 +139,10 @@ def load_data_config(dir) -> dict:
             data = json.load(file)
             return data
     except FileNotFoundError:
-        print("Error: config.json file not found.")
+        logger.error("Error: config.json file not found.")
         return {}
     except json.JSONDecodeError:
-        print("Error: Failed to decode JSON from config.json.")
+        logger.error("Error: Failed to decode JSON from config.json.")
         return {}
 
 
@@ -136,51 +167,44 @@ def create_button(
     button = ttk.Button(
         root, text=title, command=lambda: launch_app(command_dict), width=width
     )
-    button.grid(row=row_index, column=column_index, padx=10, pady=10)
+    button.grid(row=row_index, column=column_index, padx=20, pady=10)
 
 
-def create_window(data: dict) -> None:
+def create_window(scripts_dict: dict) -> None:
     """
-    Creates the main window and populates it with buttons based on the provided data.
+    Creates the main window and populates it with buttons based on the provided scripts_dict.
     Parameters:
-        data (dict): A dictionary containing the configuration data for the buttons.
+        scripts_dict (dict): A dictionary containing the configuration data for the buttons.
     """
     # Create the main window
     root = ttk.Window(themename="darkly")
-    root.title("Tools Launcher")
+    root.title("Launcher")
+
+    # Set the icon for the window
+    root.iconbitmap("assets/icon.ico")
 
     # Set the button size and padding params to use to calculate the window size
-    button_width = max(len(key) for key in data.keys()) * 10
-    button_height = 30
-    padding = 50
+    button_width = max(len(key) for key in scripts_dict.keys()) * 10
 
     # Initialize row and column indices
     row_index = 0
     column_index = 0
-
-    # Calculate the number of rows and columns for the window size
-    num_buttons = len(data)
-    num_columns = 1 if num_buttons <= 4 else int((len(data) // 4))
-    num_rows = num_buttons if num_buttons <= 4 else 4  # Calculate rows needed
-
-    # Calculate the window size based on button size, padding, and the number of columns and rows
-    window_width = num_columns * button_width + (num_columns + 1) * padding
-    window_height = num_rows * button_height + (num_rows + 1) * padding
-
-    # Set the window size and position
-    root.geometry(f"{window_width}x{window_height}")
     root.resizable(False, False)
+    root.attributes("-topmost", ALWAYS)
+
+    master_frame = ttk.Frame(root)
+    master_frame.pack(padx=20, pady=10, fill="x")
 
     # Create a label for the title
-    title_label = ttk.Label(root, text="Tools Launcher", font=("Arial", 24))
-    title_label.pack(padx=10, pady=20)
+    title_label = ttk.Label(master_frame, text="Script Launcher", font=("Arial", 18))
+    title_label.pack(padx=10, pady=10)
 
     # Create a frame for the buttons
-    button_frame = ttk.Frame(root)
-    button_frame.pack(pady=20)
+    button_frame = ttk.Frame(master_frame)
+    button_frame.pack()
 
-    # Create buttons based on the data
-    for button_title, command_dict in data.items():
+    # Create buttons based on the scripts_dict
+    for button_title, command_dict in scripts_dict.items():
         create_button(
             row_index,
             column_index,
@@ -190,15 +214,79 @@ def create_window(data: dict) -> None:
             int(button_width / 10),
         )
         row_index += 1
-        column_index += 1 if row_index >= 4 else 0
+        column_index += 1 if row_index >= ROW_LIMIT else 0
         # Reset row index if it exceeds 4
         if row_index == ROW_LIMIT:
             row_index = 0
+
+    # Add a separator line
+    separator = ttk.Separator(master_frame, orient="horizontal")
+    separator.pack(fill="x", padx=20, pady=10)
+
+    # Create a frame to align the settings label and stop button horizontally
+    settings_frame = ttk.Frame(master_frame)
+    settings_frame.pack(fill="x", padx=20, pady=10)
+
+    # Add a button to quit the running subprocess
+    stop_button = ttk.Button(
+        settings_frame,
+        text="Stop Process",
+        command=lambda: [
+            logger.info("Terminating the running subprocess"),
+            (
+                PROCESS.terminate()
+                if "process" in globals() and PROCESS.poll() is None
+                else logger.info("No subprocess to terminate")
+            ),
+        ],
+    )
+
+    # Disable the stop button initially
+    stop_button["state"] = "disabled"
+
+    # Update the stop button state when a process is running
+    def update_stop_button_state():
+        if "process" in globals() and PROCESS and PROCESS.poll() is None:
+            stop_button["state"] = "normal"
+        else:
+            stop_button["state"] = "disabled"
+
+    # Periodically check the process state and update the button
+    def monitor_process():
+        update_stop_button_state()
+        root.after(1000, monitor_process)
+
+    # Start monitoring the process state
+    monitor_process()
+
+    # Pack the settings label and stop button in the same frame
+    stop_button.pack(in_=settings_frame, side="right", anchor="e")
+
+    # Define the function to toggle the "Always on Top" attribute
+    def toggle_always_on_top():
+        root.attributes("-topmost", always_on_top_var.get())
+
+    # Create a checkbox for "Always on Top"
+    always_on_top_var = ttk.IntVar(value=1 if ALWAYS else 0)
+    always_on_top_checkbox = ttk.Checkbutton(
+        settings_frame,
+        text="Always on Top",
+        variable=always_on_top_var,
+        command=toggle_always_on_top,
+    )
+    always_on_top_checkbox.pack(in_=settings_frame, side="left", anchor="w")
+
+    # Add bottom padding to the window
+    bottom_padding = ttk.Frame(root)
+    bottom_padding.pack(pady=10)
 
     root.mainloop()
 
 
 if __name__ == "__main__":
+    # Create the logger
+    logger = create_logger()
+
     # Set the current working directory to the script's directory
     script_path = sys.argv[0]
     if os.path.dirname(script_path):
@@ -211,8 +299,17 @@ if __name__ == "__main__":
 
     # Check if data is loaded successfully
     if not data:
-        print("No data loaded. Exiting.")
+        logger.error("No data loaded. Exiting.")
         sys.exit(1)
 
+    # Get the row limit from the config file
+    ROW_LIMIT = data.get("config", {}).get("ROW_LIMIT", ROW_LIMIT)
+
+    # Get the "Always on Top" setting from the config file
+    ALWAYS = data.get("config", {}).get("ALWAYS", False)
+
+    # Get the scripts dictionary from the loaded data
+    scripts_dict = data.get("scripts", {})
+
     # Create and launch the main window
-    create_window(data)
+    create_window(scripts_dict)
