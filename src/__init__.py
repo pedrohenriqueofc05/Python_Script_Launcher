@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import json
 import subprocess
 import logging
@@ -8,7 +9,7 @@ import ttkbootstrap as ttk
 
 # Constants
 ROW_LIMIT = 4  # Maximum number of rows for buttons in the window
-PROCESS = None  # Global variable to store the launched process
+PROCESS = subprocess.Popen  # Global variable to store the launched process
 ALWAYS = False  # Default value for "Always on Top" setting
 
 
@@ -49,6 +50,8 @@ def launch_app(command_dict: dict) -> None:
 
         # Get the script path and arguments
         script_path = command_dict.get("path")
+        if not check_path_format(script_path):
+            return
         if command_dict.get("args"):
             args = command_dict.get("args")
             if isinstance(args, list):
@@ -99,6 +102,56 @@ def launch_app(command_dict: dict) -> None:
         logger.exception(f"Error launching the application: {e}")
 
 
+def check_path_format(path_str) -> bool:
+    """
+    Checks the provided path to see if it's compatible for the current OS.
+    Parameters:
+        - path_str(str): The path to check.
+    Returns:
+        - bool: True if everything is correct, False if anything incompatible is found.
+    """
+    # Check for Windows OS
+    if os.name == "nt":
+        # Windows paths typically have a \ in them
+        if "\\" not in path_str:
+            logger.error(
+                f"Path format is incorrect for Windows systems. Separator: '\\' is required. \n>> Path: {path_str}"
+            )
+            return False
+        # Ensure the path does not contain illegal Windows characters
+        illegal_chars = r'[<>:"/\\|?*]'
+        if re.search(illegal_chars, path_str):
+            logger.error(f"Path contains invalid characters for Windows systems \n>> Path: {path_str}")
+            return False
+        # Additional check: if the path starts with a drive letter, ensure the first character is a letter
+        if path_str[1] == ":" and not path_str[0].isalpha():
+            logger.error(f"Invalid drive letter format in path \n>> Path: {path_str}")
+            return False
+
+    # Check for POSIX OS (Linux/macOS)
+    elif os.name == "posix":
+        # POSIX paths should contain "/"
+        if "/" not in path_str:
+            logger.error(
+                f"Path format is incorrect for POSIX systems (Mac OS/Linux). Separator '/' is required. \n>> Path: {path_str}"
+            )
+            return False
+        # Ensure the path does not contain illegal characters
+        if re.search(r'\0', path_str):  # null byte is illegal
+            logger.error(f"Path contains invalid characters for POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+            return False
+        # Optional check: does the path begin with a '/' for absolute paths?
+        if path_str.startswith("/") and not os.path.isabs(path_str):
+            logger.error(f"Absolute path should start with '/' on POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+            return False
+
+    else:
+        logger.error(f"Unsupported OS - {os.name}")
+        return False
+
+    return True
+
+
 def check_dict(command_dict: dict) -> bool:
     """
     Checks if the command dictionary is formatted correctly.
@@ -125,17 +178,17 @@ def check_dict(command_dict: dict) -> bool:
     return True
 
 
-def load_data_config(dir) -> dict:
+def load_data_config(dir_str) -> dict:
     """
     Loads the configuration data from the config.json file.
     The config.json file should be located in the specified directory.
     Parameters:
-        dir (str): The directory where the config.json file is located.
+        dir_str (str): The directory where the config.json file is located.
     Returns:
         dict: A dictionary containing the configuration data.
     """
     try:
-        with open(os.path.join(dir, "config.json"), "r") as file:
+        with open(os.path.join(dir_str, "config.json"), "r") as file:
             data = json.load(file)
             return data
     except FileNotFoundError:
@@ -146,20 +199,20 @@ def load_data_config(dir) -> dict:
         return {}
 
 
-def write_config(dir, key, value) -> None:
+def write_config(dir_str, key, value) -> None:
     """
     Writes the configuration data to the config.json file.
     The config.json file should be located in the specified directory.
     Parameters:
-        dir (str): The directory where the config.json file is located.
+        dir_str (str): The directory where the config.json file is located.
         key (str): The key to be updated in the config.json file's config dict.
         value: The value to be set for the specified key.
     """
     try:
-        with open(os.path.join(dir, "config.json"), "r") as file:
+        with open(os.path.join(dir_str, "config.json"), "r") as file:
             data = json.load(file)
             data["config"][key] = value
-        with open(os.path.join(dir, "config.json"), "w") as file:
+        with open(os.path.join(dir_str, "config.json"), "w") as file:
             json.dump(data, file, indent=4)
     except FileNotFoundError:
         logger.error("Error: config.json file not found.")
@@ -193,6 +246,22 @@ def create_button(
     button.grid(row=row_index, column=column_index, padx=20, pady=10)
 
 
+def get_path() -> str:
+    """
+    Get the working path of the script for use later.
+    Returns:
+        - str: The file path string for where the script is running.
+    """
+
+    # Determine the correct path to the icon depending on if the app is bundled or not
+    if getattr(sys, 'frozen', False):
+        app_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    else:
+        app_path = os.path.dirname(__file__)
+
+    return app_path
+
+
 def create_window(scripts_dict: dict) -> None:
     """
     Creates the main window and populates it with buttons based on the provided scripts_dict.
@@ -206,8 +275,14 @@ def create_window(scripts_dict: dict) -> None:
     root = ttk.Window(themename="darkly")
     root.title("Launcher")
 
+    app_path = get_path()
+
     # Set the icon for the window
-    root.iconbitmap("assets/icon.ico")
+    if os.name == "nt":
+        root.iconbitmap("assets/icon.ico")
+        root.iconphoto(True, ttk.PhotoImage(file=os.path.join(app_path, 'assets', 'icon.ico')))
+    elif os.name == "posix":
+        root.iconphoto(True, ttk.PhotoImage(file=os.path.join(app_path, 'assets', 'icon.png')))
 
     # Set the button size and padding params to use to calculate the window size
     button_width = max(len(key) for key in scripts_dict.keys()) * 10
