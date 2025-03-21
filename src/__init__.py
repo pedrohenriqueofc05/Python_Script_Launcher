@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import json
 import subprocess
 import logging
@@ -49,6 +50,8 @@ def launch_app(command_dict: dict) -> None:
 
         # Get the script path and arguments
         script_path = command_dict.get("path")
+        if not check_path_format(script_path):
+            return
         if command_dict.get("args"):
             args = command_dict.get("args")
             if isinstance(args, list):
@@ -97,6 +100,56 @@ def launch_app(command_dict: dict) -> None:
 
     except Exception as e:
         logger.exception(f"Error launching the application: {e}")
+
+
+def check_path_format(path_str) -> bool:
+    """
+    Checks the provided path to see if it's compatible for the current OS.
+    Parameters:
+        - path_str(str): The path to check.
+    Returns:
+        - bool: True if everything is correct, False if anything incompatible is found.
+    """
+    # Check for Windows OS
+    if os.name == "nt":
+        # Windows paths typically have a \ in them
+        if "\\" not in path_str:
+            logger.error(
+                f"Path format is incorrect for Windows systems. Separator: '\\' is required. \n>> Path: {path_str}"
+            )
+            return False
+        # Ensure the path does not contain illegal Windows characters
+        illegal_chars = r'[<>:"/\\|?*]'
+        if re.search(illegal_chars, path_str):
+            logger.error(f"Path contains invalid characters for Windows systems \n>> Path: {path_str}")
+            return False
+        # Additional check: if the path starts with a drive letter, ensure the first character is a letter
+        if path_str[1] == ":" and not path_str[0].isalpha():
+            logger.error(f"Invalid drive letter format in path \n>> Path: {path_str}")
+            return False
+
+    # Check for POSIX OS (Linux/macOS)
+    elif os.name == "posix":
+        # POSIX paths should contain "/"
+        if "/" not in path_str:
+            logger.error(
+                f"Path format is incorrect for POSIX systems (Mac OS/Linux). Separator '/' is required. \n>> Path: {path_str}"
+            )
+            return False
+        # Ensure the path does not contain illegal characters
+        if re.search(r'[\0]', path_str):  # null byte is illegal
+            logger.error(f"Path contains invalid characters for POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+            return False
+        # Optional check: does the path begin with a '/' for absolute paths?
+        if path_str.startswith("/") and not os.path.isabs(path_str):
+            logger.error(f"Absolute path should start with '/' on POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+            return False
+
+    else:
+        logger.error(f"Unsupported OS - {os.name}")
+        return False
+
+    return True
 
 
 def check_dict(command_dict: dict) -> bool:
@@ -207,7 +260,11 @@ def create_window(scripts_dict: dict) -> None:
     root.title("Launcher")
 
     # Set the icon for the window
-    root.iconbitmap("assets/icon.ico")
+    if os.name == "nt":
+        root.iconbitmap("assets/icon.ico")
+        root.iconphoto(True, tk.PhotoImage(file='assets/icon.ico'))
+    elif os.name == "posix":
+        root.iconphoto(True, tk.PhotoImage(file='assets/icon.png'))
 
     # Set the button size and padding params to use to calculate the window size
     button_width = max(len(key) for key in scripts_dict.keys()) * 10
