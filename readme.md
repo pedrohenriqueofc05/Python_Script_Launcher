@@ -148,18 +148,35 @@ The `config.json` file is used to define the scripts and settings available in t
 
 To build the executable version of the launcher:
 
+### Windows:
+
 1. Install `PyInstaller`:
-
-    ```bash
-    pip install pyinstaller
-    ```
-
+    
+```bash
+pip install pyinstaller
+```
+    
 2. Run the following command in the project directory:
+    
+```bash
+pyinstaller --onefile --noconsole src/__init__.py --name=python_script_launcher --add-data "src/assets/*:assets"
+```
+    
+3. The built executable will be located in the `dist` directory.
+### Mac OS:
 
-    ```bash
-    pyinstaller --onefile --noconsole src/__init__.py --name python_script_launcher
-    ```
-
+1. Install `PyInstaller`:
+    
+```bash
+pip install pyinstaller
+```
+    
+2. Run the following command in the project directory:
+    
+```bash
+pyinstaller --onefile --windowed src/__init__.py --name=python_script_launcher --add-data "src/assets/*:assets"
+```
+    
 3. The built executable will be located in the `dist` directory.
 
 ## Troubleshooting
