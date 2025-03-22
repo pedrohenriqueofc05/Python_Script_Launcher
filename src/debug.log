@@ -1,7 +1,0 @@
-2025-03-20 23:05:51 - 170 - check_dict - [ERROR] - Error: Command dictionary does not contain 'path' key.
-2025-03-20 23:05:53 - 135 - check_path_format - [ERROR] - Path format is incorrect for POSIX systems (Mac OS/Linux). Separator '/' is required. 
->> Path: C:\ExampleFolder\ExampleScript.py
-2025-03-20 23:05:54 - 135 - check_path_format - [ERROR] - Path format is incorrect for POSIX systems (Mac OS/Linux). Separator '/' is required. 
->> Path: C:\ExampleFolder\ExampleScript.py
-2025-03-20 23:05:55 - 135 - check_path_format - [ERROR] - Path format is incorrect for POSIX systems (Mac OS/Linux). Separator '/' is required. 
->> Path: C:\ExampleFolder\ExampleScript.py

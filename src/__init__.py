@@ -4,6 +4,7 @@ import re
 import json
 import subprocess
 import logging
+import platform
 from ttkbootstrap import *
 import ttkbootstrap as ttk
 
@@ -119,9 +120,11 @@ def check_path_format(path_str) -> bool:
             )
             return False
         # Ensure the path does not contain illegal Windows characters
-        illegal_chars = r'[<>:"/\\|?*]'
+        illegal_chars = r'[<>"/|?*]'
         if re.search(illegal_chars, path_str):
-            logger.error(f"Path contains invalid characters for Windows systems \n>> Path: {path_str}")
+            logger.error(
+                f"Path contains invalid characters for Windows systems \n>> Path: {path_str}"
+            )
             return False
         # Additional check: if the path starts with a drive letter, ensure the first character is a letter
         if path_str[1] == ":" and not path_str[0].isalpha():
@@ -137,12 +140,16 @@ def check_path_format(path_str) -> bool:
             )
             return False
         # Ensure the path does not contain illegal characters
-        if re.search(r'\0', path_str):  # null byte is illegal
-            logger.error(f"Path contains invalid characters for POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+        if re.search(r"\0", path_str):  # null byte is illegal
+            logger.error(
+                f"Path contains invalid characters for POSIX systems (Mac OS/Linux) \n>> Path: {path_str}"
+            )
             return False
         # Optional check: does the path begin with a '/' for absolute paths?
         if path_str.startswith("/") and not os.path.isabs(path_str):
-            logger.error(f"Absolute path should start with '/' on POSIX systems (Mac OS/Linux) \n>> Path: {path_str}")
+            logger.error(
+                f"Absolute path should start with '/' on POSIX systems (Mac OS/Linux) \n>> Path: {path_str}"
+            )
             return False
 
     else:
@@ -254,12 +261,71 @@ def get_path() -> str:
     """
 
     # Determine the correct path to the icon depending on if the app is bundled or not
-    if getattr(sys, 'frozen', False):
-        app_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    if getattr(sys, "frozen", False):
+        app_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     else:
         app_path = os.path.dirname(__file__)
 
     return app_path
+
+
+def is_dark_mode() -> bool:
+    """
+    This function checks the system's theme settings to determine if dark mode is enabled.
+    Returns:
+        bool: True if dark mode is enabled, False otherwise.
+    """
+    system = platform.system()
+
+    # If the system is Windows, check the registry for dark mode settings
+    if system == "Windows":
+        # Import the winreg module to access the Windows registry
+        import winreg
+
+        # Check if the registry key exists for dark mode
+        try:
+            # Open the registry key for the current user
+            registry_key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+            )
+            value, _ = winreg.QueryValueEx(registry_key, "AppsUseLightTheme")
+            winreg.CloseKey(registry_key)
+            return True if value == 0 else False
+        except FileNotFoundError:
+            return False
+    # If the system is macOS, check the defaults for dark mode settings
+    elif system == "Darwin":
+
+        try:
+            # Check if the defaults command is available
+            result = subprocess.run(
+                ["defaults", "read", "-g", "AppleInterfaceStyle"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            return True if "Dark" in result.stdout else False
+        except Exception:
+            return False
+
+    # If the system is Linux, check for GNOME or KDE desktop environments
+    elif system == "Linux":
+        # Check for GNOME or KDE desktop environments
+        try:
+            # Check if the gsettings command is available
+            result = subprocess.run(
+                ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            return True if "dark" in result.stdout.lower() else False
+        except Exception:
+            return False
+
+    else:
+        return False
 
 
 def create_window(scripts_dict: dict) -> None:
@@ -271,18 +337,25 @@ def create_window(scripts_dict: dict) -> None:
 
     global ROW_LIMIT, ALWAYS, PROCESS
 
+    if is_dark_mode():
+        theme_name = "darkly"
+    else:
+        theme_name = "flatly"
+
     # Create the main window
-    root = ttk.Window(themename="darkly")
+    root = ttk.Window(themename=theme_name)
     root.title("Launcher")
 
     app_path = get_path()
 
     # Set the icon for the window
     if os.name == "nt":
-        root.iconbitmap("assets/icon.ico")
-        root.iconphoto(True, ttk.PhotoImage(file=os.path.join(app_path, 'assets', 'icon.ico')))
+        root.iconbitmap(os.path.join(app_path, "assets", "icon.ico"))
     elif os.name == "posix":
-        root.iconphoto(True, ttk.PhotoImage(file=os.path.join(app_path, 'assets', 'icon.png')))
+        root.iconphoto(
+            True,
+            ttk.PhotoImage(file=os.path.join(app_path, "src", "assets", "icon.png")),
+        )
 
     # Set the button size and padding params to use to calculate the window size
     button_width = max(len(key) for key in scripts_dict.keys()) * 10
@@ -376,7 +449,7 @@ def create_window(scripts_dict: dict) -> None:
                 ALWAYS = False
                 write_config(script_dir, "ALWAYS", ALWAYS)
 
-    # Create a checkbox for "Always on Top"
+    # Create a checkbox for "Always on-top"
     always_on_top_var = ttk.IntVar(value=1 if ALWAYS else 0)
     always_on_top_checkbox = ttk.Checkbutton(
         settings_frame,

@@ -1,8 +1,0 @@
-2025-03-20 22:24:01 - 195 - load_data_config - [ERROR] - Error: config.json file not found.
-2025-03-20 22:24:01 - 400 - <module> - [ERROR] - No data loaded. Exiting.
-2025-03-20 22:24:07 - 195 - load_data_config - [ERROR] - Error: config.json file not found.
-2025-03-20 22:24:07 - 400 - <module> - [ERROR] - No data loaded. Exiting.
-2025-03-20 22:24:27 - 195 - load_data_config - [ERROR] - Error: config.json file not found.
-2025-03-20 22:24:27 - 400 - <module> - [ERROR] - No data loaded. Exiting.
-2025-03-20 22:24:52 - 195 - load_data_config - [ERROR] - Error: config.json file not found.
-2025-03-20 22:24:52 - 400 - <module> - [ERROR] - No data loaded. Exiting.
